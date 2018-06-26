@@ -1,0 +1,107 @@
+{
+  "project_info": {
+    "project_number": "547651979948",
+    "firebase_url": "https://teletaxiapp-6cc8e.firebaseio.com",
+    "project_id": "teletaxiapp-6cc8e",
+    "storage_bucket": "teletaxiapp-6cc8e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:547651979948:android:354123685efdcf49",
+        "android_client_info": {
+          "package_name": "com.colossus.teletaxiapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "547651979948-14949a4thji7k7n2p1qdm5lqgujhumie.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.colossus.teletaxiapp",
+            "certificate_hash": "ed588bc8933150df432dfc77cb991e67fdac1161"
+          }
+        },
+        {
+          "client_id": "547651979948-siluf7d0319ugedg43ebbl2uhtfdji7j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.colossus.teletaxiapp",
+            "certificate_hash": "20e9e8eb6f35dd7fe58224f3ec5b71ab0572a5a5"
+          }
+        },
+        {
+          "client_id": "547651979948-khb4me7f1c4627h34dgeu5gpamlieirj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3JxxzKH09EwcnIq9QlGb9KlRpZ5WQa_s"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "547651979948-khb4me7f1c4627h34dgeu5gpamlieirj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:547651979948:android:6ee5d519237d5426",
+        "android_client_info": {
+          "package_name": "com.colossus.teletaxidriver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "547651979948-e3eotcg91h1skhjr2kvibq53hinefeji.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.colossus.teletaxidriver",
+            "certificate_hash": "ed588bc8933150df432dfc77cb991e67fdac1161"
+          }
+        },
+        {
+          "client_id": "547651979948-khb4me7f1c4627h34dgeu5gpamlieirj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3JxxzKH09EwcnIq9QlGb9KlRpZ5WQa_s"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "547651979948-khb4me7f1c4627h34dgeu5gpamlieirj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Teletaxi Driver</string>
+    <string name="splash_image">Imagen de Bienvenida</string>
+    <string name="email">Correo</string>
+    <string name="pswd">Contraseña</string>
+    <string name="login">Iniciar Sesion</string>
+    <string name="register">Registrarse</string>
+    <string name="title_activity_maps">Map</string>
+</resources>
