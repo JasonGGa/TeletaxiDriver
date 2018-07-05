@@ -70,8 +70,8 @@ public class LoginActivity extends AppCompatActivity {
                         } else {
                             String userId = fbAuth.getCurrentUser().getUid();
 
-                            DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference().child("User").child("Driver").child(userId);
-                            dbReference.setValue(true);
+                            DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference().child("User").child("Driver").child(userId).child("name");
+                            dbReference.setValue(email);
                         }
                     }
                 });

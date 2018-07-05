@@ -6,4 +6,9 @@
     <string name="login">Iniciar Sesion</string>
     <string name="register">Registrarse</string>
     <string name="title_activity_maps">Map</string>
+    <string name="profile_image">Imagen de Perfil</string>
+    <string name="name">Nombre</string>
+    <string name="phone">Número de teléfono</string>
+    <string name="save">Guardar</string>
+    <string name="plate">Número de Placa</string>
 </resources>

@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -47,7 +46,7 @@ import java.util.Map;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
-    private Button bLogout;
+    private Button bLogout, bSettings;
 
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
@@ -119,6 +118,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        bSettings = findViewById(R.id.settings);
+        bSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MapsActivity.this, SettingsActivity.class);
+                startActivity(intent);
+            }
+        });
+
         getAssignedCustomer();
     }
 
@@ -138,6 +146,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (assignedCustomerPickupLocationRefListener != null)
                         assignedCustomerPickupLocationRef.removeEventListener(assignedCustomerPickupLocationRefListener);
                     customerInfo.setVisibility(View.GONE);
+                    customerName.setText("");
+                    customerPhone.setText("");
                 }
             }
 
@@ -156,7 +166,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0) {
                     Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
-                    customerName.setText(customerId);
+                    if (map.get("name") != null) {
+                        customerName.setText(map.get("name").toString());
+                    }
+                    if (map.get("phone") != null) {
+                        customerPhone.setText(map.get("phone").toString());
+                    }
                 }
             }
 
