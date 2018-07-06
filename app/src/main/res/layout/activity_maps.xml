@@ -29,18 +29,29 @@
         android:id="@+id/customerInfo"
         android:layout_gravity="bottom"
         android:orientation="vertical"
-        android:background="@color/common_google_signin_btn_text_light_disabled"
+        android:background="@android:color/white"
         android:visibility="gone" >
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/customerName"/>
+            android:id="@+id/customerDestination"
+            android:paddingBottom="10sp"
+            android:paddingTop="20sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/customerPhone"/>
+            android:id="@+id/customerName"
+            android:paddingBottom="10sp"
+            android:paddingTop="20sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/customerPhone"
+            android:paddingBottom="10sp"
+            android:paddingTop="20sp" />
 
     </LinearLayout>
 
