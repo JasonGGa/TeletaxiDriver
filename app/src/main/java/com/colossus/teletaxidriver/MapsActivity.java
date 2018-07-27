@@ -54,7 +54,9 @@ import java.util.Map;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener, RoutingListener {
 
-    private Button bLogout, bSettings;
+    private Button bLogout, bSettings, bRideStatus;
+
+    private int status = 0;
 
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
@@ -64,7 +66,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private FusedLocationProviderClient mFusedLocationClient;
 
     private String userId;
-    private String customerId = "";
+    private String customerId = "", destination;
+    private LatLng destinationLatLng;
 
     Marker pickupMarker;
     private DatabaseReference assignedCustomerPickupLocationRef;
@@ -125,6 +128,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 });
                 FirebaseAuth.getInstance().signOut();
+                LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, MapsActivity.this);
 
                 Intent intent = new Intent(MapsActivity.this, LoginActivity.class);
                 startActivity(intent);
@@ -141,6 +145,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        bRideStatus.findViewById(R.id.rideStatus);
+        bRideStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switch (status) {
+                    case 1:
+                        status = 2;
+                        erasePolylines();
+                        if (destinationLatLng.latitude != 0.0 && destinationLatLng.longitude != 0.0)
+                            getRouteToMarker(destinationLatLng);
+                        bRideStatus.setText("Viaje completado");
+                        break;
+                    case 2:
+                        endRide();
+                        break;
+                }
+            }
+        });
+
         getAssignedCustomer();
     }
 
@@ -150,21 +173,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+                    status = 1;
                     customerId = dataSnapshot.getValue().toString();
                     getAssignedCustomerPickupLocation();
                     getAssignedCustomerDestination();
                     getAssignedCustomerInfo();
                 } else {
-                    erasePolylines();
-                    customerId = "";
-                    if (pickupMarker != null)
-                        pickupMarker.remove();
-                    if (assignedCustomerPickupLocationRefListener != null)
-                        assignedCustomerPickupLocationRef.removeEventListener(assignedCustomerPickupLocationRefListener);
-                    customerInfo.setVisibility(View.GONE);
-                    customerName.setText("");
-                    customerPhone.setText("");
-                    customerDestination.setText("Destino: --");
+                    endRide();
                 }
             }
 
@@ -176,15 +191,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void getAssignedCustomerDestination() {
-        final DatabaseReference assignedCustomerRef = FirebaseDatabase.getInstance().getReference().child("User").child("Driver").child(userId).child("customerRequest").child("destination");
+        final DatabaseReference assignedCustomerRef = FirebaseDatabase.getInstance().getReference().child("User").child("Driver").child(userId).child("customerRequest");
         assignedCustomerRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    String destination = dataSnapshot.getValue().toString();
-                    customerDestination.setText("Destino:" + destination);
-                } else {
-                    customerDestination.setText("Destino: --");
+                    Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
+                    if (map.get("destination") != null) {
+                        destination = map.get("destination").toString();
+                        customerDestination.setText("Destino: " + destination);
+                    } else
+                        customerDestination.setText("Destino: --");
+
+                    Double destinationLat = 0.0;
+                    Double destinationLng = 0.0;
+                    if (map.get("destinationLat") != null) {
+                        destinationLat = Double.valueOf(map.get("destinationLat").toString());
+                    }
+                    if (map.get("destinationLng") != null) {
+                        destinationLng = Double.valueOf(map.get("destinationLng").toString());
+                        destinationLatLng  = new LatLng(destinationLat, destinationLng);
+                    }
                 }
             }
 
@@ -258,6 +285,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .waypoints(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), pickupLatLng)
                 .build();
         routing.execute();
+    }
+
+    private void endRide() {
+        bRideStatus.setText("Iniciar Viaje");
+        erasePolylines();
+
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference().child("User").child("Driver").child(userId).child("customerRequest");
+        driverRef.removeValue();
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("customerRequest");
+        GeoFire geoFire = new GeoFire(ref);
+        geoFire.removeLocation(customerId);
+        customerId = "";
+
+        if (pickupMarker != null)
+            pickupMarker.remove();
+        if (assignedCustomerPickupLocationRefListener != null)
+            assignedCustomerPickupLocationRef.removeEventListener(assignedCustomerPickupLocationRefListener);
+        customerInfo.setVisibility(View.GONE);
+        customerName.setText("");
+        customerPhone.setText("");
+        customerDestination.setText("Destino: --");
     }
 
 
@@ -373,7 +423,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onStop() {
         super.onStop();
-        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
