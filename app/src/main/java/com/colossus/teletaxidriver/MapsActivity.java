@@ -145,7 +145,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        bRideStatus.findViewById(R.id.rideStatus);
+        bRideStatus = findViewById(R.id.rideStatus);
         bRideStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -297,7 +297,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("customerRequest");
         GeoFire geoFire = new GeoFire(ref);
-        geoFire.removeLocation(customerId);
+        geoFire.removeLocation(customerId, new GeoFire.CompletionListener() {
+            @Override
+            public void onComplete(String key, DatabaseError error) {
+            }
+        });
         customerId = "";
 
         if (pickupMarker != null)
