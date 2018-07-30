@@ -48,6 +48,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -70,6 +71,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LatLng destinationLatLng;
 
     Marker pickupMarker;
+    private LatLng pickupLatLng;
     private DatabaseReference assignedCustomerPickupLocationRef;
     private ValueEventListener assignedCustomerPickupLocationRefListener;
 
@@ -158,6 +160,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         bRideStatus.setText("Viaje completado");
                         break;
                     case 2:
+                        recordRide();
                         endRide();
                         break;
                 }
@@ -259,14 +262,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (location != null && location.get(1) != null) {
                         lng = Double.parseDouble(location.get(1).toString());
                     }
-                    LatLng pickupLatLng = new LatLng(lat, lng);
+                    pickupLatLng = new LatLng(lat, lng);
                     pickupMarker = mMap.addMarker(new MarkerOptions().position(pickupLatLng).title("Tu pasajero te espera"));
                     getRouteToMarker(pickupLatLng);
 
                     LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                    builder.include(pickupLatLng);
                     builder.include(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 10));
+                    builder.include(pickupLatLng);
+                    LatLngBounds bounds =builder.build();
+
+                    int width = getResources().getDisplayMetrics().widthPixels;
+                    int padding = (int) (width*0.2);
+
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
                 }
             }
 
@@ -312,6 +320,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         customerName.setText("");
         customerPhone.setText("");
         customerDestination.setText("Destino: --");
+    }
+
+    private void recordRide() {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference().child("User").child("Driver").child(userId).child("history");
+        DatabaseReference customerRef = FirebaseDatabase.getInstance().getReference().child("User").child("Customer").child(customerId).child("history");
+        DatabaseReference historyRef = FirebaseDatabase.getInstance().getReference().child("history");
+        String requestId = historyRef.push().getKey();
+        driverRef.child(requestId).setValue(true);
+        customerRef.child(requestId).setValue(true);
+
+        HashMap map = new HashMap();
+        map.put("driver", userId);
+        map.put("customer", customerId);
+        map.put("timestamp", getTimestamp());
+        map.put("destination", destination);
+        map.put("location/from/lat", pickupLatLng.latitude);
+        map.put("location/from/lng", pickupLatLng.longitude);
+        map.put("location/to/lat", destinationLatLng.latitude);
+        map.put("location/to/lng", destinationLatLng.longitude);
+        historyRef.child(requestId).updateChildren(map);
+    }
+
+    private Long getTimestamp() {
+        Long timestamp = System.currentTimeMillis()/1000;
+        return timestamp;
     }
 
 
