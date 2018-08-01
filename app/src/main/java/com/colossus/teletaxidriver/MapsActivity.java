@@ -13,7 +13,9 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,6 +58,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener, RoutingListener {
 
     private Button bLogout, bSettings, bRideStatus;
+
+    private Switch sWorking;
 
     private int status = 0;
 
@@ -121,14 +125,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         bLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("driversAvailable");
-                GeoFire geoFire = new GeoFire(ref);
-                geoFire.removeLocation(userId, new GeoFire.CompletionListener() {
-                    @Override
-                    public void onComplete(String key, DatabaseError error) {
-                    }
-                });
+                disconnectDriver();
                 FirebaseAuth.getInstance().signOut();
                 LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, MapsActivity.this);
 
@@ -163,6 +160,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         recordRide();
                         endRide();
                         break;
+                }
+            }
+        });
+
+        sWorking = findViewById(R.id.working);
+        sWorking.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    connectDriver();
+                } else {
+                    disconnectDriver();
                 }
             }
         });
@@ -348,6 +357,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return timestamp;
     }
 
+    private void connectDriver() {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, LOCATION_REQUEST_CODE);
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+    }
+
+    private void disconnectDriver() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("driversAvailable");
+        GeoFire geoFire = new GeoFire(ref);
+        geoFire.removeLocation(userId, new GeoFire.CompletionListener() {
+            @Override
+            public void onComplete(String key, DatabaseError error) {
+            }
+        });
+    }
+
 
     /**
      * Manipulates the map once available.
@@ -425,12 +451,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationRequest.setInterval(1000);
         locationRequest.setFastestInterval(1000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, LOCATION_REQUEST_CODE);
-        }
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
-        //LocationServices.getFusedLocationProviderClient(this).requestLocationUpdates(locationRequest);
     }
 
     @Override
