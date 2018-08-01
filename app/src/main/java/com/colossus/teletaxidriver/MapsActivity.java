@@ -127,7 +127,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View view) {
                 disconnectDriver();
                 FirebaseAuth.getInstance().signOut();
-                LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, MapsActivity.this);
 
                 Intent intent = new Intent(MapsActivity.this, LoginActivity.class);
                 startActivity(intent);
@@ -365,6 +364,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void disconnectDriver() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, MapsActivity.this);
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("driversAvailable");
         GeoFire geoFire = new GeoFire(ref);
         geoFire.removeLocation(userId, new GeoFire.CompletionListener() {
@@ -476,11 +476,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 break;
             }
         }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
     }
 
     @Override
